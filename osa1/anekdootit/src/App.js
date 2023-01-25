@@ -85,7 +85,7 @@ const App = () => {
   }
 
   var indexOfMostVotes = findIndexOfMaxVotes()
-  // console.log(indexOfMostVotes)
+
 
   return (
     <div>
