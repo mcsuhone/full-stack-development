@@ -3,12 +3,15 @@ import Persons from './components/Persons.js'
 import Filter from './components/Filter.js'
 import PersonForm from './components/PersonForm.js'
 import personService from './services/personService.js'
+import Notification from './components/Notification.js'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState('notification')
 
   const hook = () => {
     console.log('effect')
@@ -27,6 +30,14 @@ const App = () => {
     setNewNumber('')
   }
 
+  const setTimedNotification = (message, type='notification') => {
+    setNotificationType(type)
+    setNotificationMessage(message)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 3000)
+  }
+
   const addPerson = () => {
     const personObject = {
       name: newName,
@@ -38,6 +49,7 @@ const App = () => {
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         clearFields()
+        setTimedNotification(`Added ${returnedPerson.name} to phonebook`)
       })
       .catch(error => {
         console.log('adding person failed')
@@ -53,12 +65,15 @@ const App = () => {
     personService
       .update(id, personObject)
       .then(returnedPerson => {
-        setPersons(persons.map(person => person.id !== id ? person : personObject))
+        setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
         clearFields()
+        setTimedNotification(`Updated ${returnedPerson.name}'s number`)
       })
       .catch(error => {
         console.log('replacing number failed')
       })
+
+      console.log('updated person ' + id)
   }
   
   const submitForm = (event) => {
@@ -81,16 +96,17 @@ const App = () => {
   const deletePerson = (id) => {
     console.log('delete person ' + id)
     const deletePerson = persons.find(p => p.id === id)
+    const deletedName = deletePerson.name
   
     personService
       .del(deletePerson.id)
       .then(()  => {
         setPersons(persons.filter(person => person.id !== id))
+        setTimedNotification(`Deleted ${deletedName} from phonebook`, 'warning')
       })
       .catch(error => {
-        alert(
-          `the person '${deletePerson.name}' was already deleted from server`
-        )
+        setPersons(persons.filter(person => person.id !== id))
+        setTimedNotification(`Information of '${deletePerson.name}' has already been removed from the server.`, 'warning')
       })
   }
 
@@ -114,6 +130,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={notificationMessage} type={notificationType}/>
       
       <Filter handleFilterChange={handleFilterChange} filterValue={newFilter}/>
 
