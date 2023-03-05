@@ -83,7 +83,7 @@ const App = () => {
     
     if (personIndex !== -1) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        updatePerson(personIndex + 1)
+        updatePerson(persons[personIndex].id)
         console.log('form submitted')
       }
     }
