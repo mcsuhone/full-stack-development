@@ -52,7 +52,8 @@ const App = () => {
         setTimedNotification(`Added ${returnedPerson.name} to phonebook`)
       })
       .catch(error => {
-        console.log('adding person failed')
+        console.log(error.response.data)
+        setTimedNotification(`${error.response.data.error}`, 'warning')
       })
   }
 
